@@ -122,10 +122,10 @@ const HANDLERS = {
       ]) ctx.color(line, "#7d1534");
       if (typeof MediaPlayerApp !== "undefined") MediaPlayerApp.create();
       if (typeof NotepadApp !== "undefined") NotepadApp.create({
-        title: "PENDIENTE.txt",
+        title: "carta",
         width: 420,
         height: 540,
-        image: "img/pendiente.png",
+        image: "img/carta.png",
       });
     }, at);
     return [];
