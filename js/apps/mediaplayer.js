@@ -1,7 +1,85 @@
+const Showtime = (() => {
+  const START = 121; // 2:01
+  const FINAL = 169; // 2:49
+  const BPM = 81;
+  const BEAT = 60 / BPM;
+
+  const PHRASES = [
+    "espero que hayas leido la carta",
+    "sino puedes volver a entrar aqui",
+    "perdon por este regalo tan miserable JAJAJA",
+    "perdon por tan poco y gracias por tanto isita",
+    "realmente te prometo más adelante algo mejor",
+    "por lo pronto seguiré deseando un abrazo tuyo",
+    "te amo demasiado isita no lo dudes",
+    "pronto, pero muy pronto t lo juro q nos veremos",
+  ];
+  const FINAL_TEXT = "feliz cumple isita <3";
+
+  const WARM = ["#008080", "#7d1534", "#8a1e3e", "#660d28"];
+
+  const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const RGB = WARM.map(hex);
+  const lerp = (a, b, f) => [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * f));
+
+  const phraseAt = (t) => {
+    if (t >= FINAL) return FINAL_TEXT;
+    if (t < START) return "";
+    const span = FINAL - START;
+    const n = PHRASES.length;
+    const idx = Math.min(n - 1, Math.floor(((t - START) / span) * n));
+    return PHRASES[idx];
+  };
+
+  let started = false;
+  let overlay = null;
+  let raf = 0;
+  let last = null;
+
+  const start = (audio) => {
+    if (started) return;
+    started = true;
+    document.body.classList.add("clean");
+    overlay = document.createElement("div");
+    overlay.id = "showtext";
+    document.body.appendChild(overlay);
+    overlay.classList.add("show");
+
+    const desk = document.getElementById("desktop");
+
+    const frame = () => {
+      const t = audio.currentTime;
+
+      const ph = phraseAt(t);
+      if (ph !== last) {
+        last = ph;
+        overlay.classList.remove("show");
+        overlay.textContent = ph;
+        void overlay.offsetWidth;
+        overlay.classList.add("show");
+      }
+
+      if (desk && t > START) {
+        const beats = Math.max(0, (t - START) / BEAT);
+        const idx = Math.floor(beats) % RGB.length;
+        const nxt = (idx + 1) % RGB.length;
+        const f = beats - Math.floor(beats);
+        const c = lerp(RGB[idx], RGB[nxt], f);
+        desk.style.background = "rgb(" + c.join(",") + ")";
+      }
+
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+  };
+
+  return { start, START, active: () => started };
+})();
+
 const MediaPlayerApp = {
   create: () => {
     const audio = new Audio("NOESCUCHASNIESCUCHO.mp3");
-    audio.loop = true;
+    audio.loop = false;
     let actx = null;
     let analyser = null;
     try {
@@ -62,6 +140,7 @@ const MediaPlayerApp = {
       audio.addEventListener("timeupdate", () => {
         fill.style.width = (audio.duration ? (audio.currentTime / audio.duration) * 100 : 0) + "%";
         timeEl.textContent = fmt(audio.currentTime) + " / " + fmt(audio.duration || 0);
+        if (!Showtime.active() && audio.currentTime >= Showtime.START) Showtime.start(audio);
       });
       audio.addEventListener("play", () => hint.textContent = "");
       audio.addEventListener("error", () => hint.textContent = "No se pudo cargar el archivo de audio.");
