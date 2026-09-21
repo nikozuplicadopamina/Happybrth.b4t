@@ -104,7 +104,7 @@ const HANDLERS = {
     const t2 = (found && found.delayAscii) || 1000;
 
     let at = t1;
-    setTimeout(() => ctx.out(pre), at);
+    setTimeout(() => ctx.out(pre + " (no vayas a cerrar nada, espera hasta el final)"), at);
     [3, 2, 1].forEach((n) => {
       at += tc;
       setTimeout(() => ctx.color(n, "#7d1534"), at);
