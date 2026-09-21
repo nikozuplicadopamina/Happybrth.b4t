@@ -36,10 +36,9 @@ body.clean #desktop {
   pointer-events: none;
   z-index: 30000;
   color: #fff3e6;
-  font-family: 'Pixelated MS Sans Serif', 'MS Sans Serif', Tahoma, sans-serif;
+  font-family: Consolas, 'Courier New', monospace;
   font-size: 30px;
   line-height: 1.4;
-  text-shadow: 2px 2px 0 #4a0a1e, -1px -1px 0 #4a0a1e;
   opacity: 0;
   transition: opacity 1.2s ease;
   white-space: pre-line;
