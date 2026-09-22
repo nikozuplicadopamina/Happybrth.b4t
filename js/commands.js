@@ -80,6 +80,7 @@ const HANDLERS = {
     "Playlist armada con suma cautulencia, escogí cada canción de forma que pareciece un album.",
     "es un poco friki el dedicar canciones para alguien que amas, pero es el mismo amor (y lo",
     "friki q soy) lo que me hizo dedicarte estas canciones solo 4 u",
+    "(no todas te las dedico obviamente JKASJDAS)"
   ],
 
   camara: () => {
