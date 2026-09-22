@@ -16,7 +16,7 @@ const Showtime = (() => {
   ];
   const FINAL_TEXT = "feliz cumple isita <3";
 
-  const WARM = ["#008080", "#7d1534", "#8a1e3e", "#660d28"];
+  const WARM = ["#006a6a", "#6b122d", "#751a35", "#570b22"];
 
   const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   const RGB = WARM.map(hex);
@@ -35,6 +35,8 @@ const Showtime = (() => {
   let overlay = null;
   let raf = 0;
   let last = null;
+  let anim = null;
+  const TYPE_MS = 18;
 
   const start = (audio) => {
     if (started) return;
@@ -47,16 +49,40 @@ const Showtime = (() => {
 
     const desk = document.getElementById("desktop");
 
-    const frame = () => {
+    const frame = (now) => {
       const t = audio.currentTime;
 
       const ph = phraseAt(t);
       if (ph !== last) {
         last = ph;
-        overlay.classList.remove("show");
-        overlay.textContent = ph;
-        void overlay.offsetWidth;
-        overlay.classList.add("show");
+        if (ph === FINAL_TEXT) {
+          anim = null;
+          overlay.textContent = ph;
+        } else {
+          anim = { goal: ph, old: overlay.textContent, len: overlay.textContent.length, erase: true, next: now };
+        }
+      }
+
+      if (anim && now >= anim.next) {
+        if (anim.erase) {
+          if (anim.len > 0) {
+            anim.len -= 1;
+            anim.next = now + TYPE_MS;
+          } else {
+            anim.erase = false;
+            anim.next = now;
+          }
+          overlay.textContent = anim.old.slice(0, anim.len);
+        } else {
+          anim.len += 1;
+          anim.next = now + TYPE_MS;
+          if (anim.len >= anim.goal.length) {
+            overlay.textContent = anim.goal;
+            anim = null;
+          } else {
+            overlay.textContent = anim.goal.slice(0, anim.len);
+          }
+        }
       }
 
       if (desk && t > START) {
